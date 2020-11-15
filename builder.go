@@ -97,12 +97,19 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 
 // Get will return a []byte with the Builder, if the Builder was
 // created with NewByteBuilder, otherwise an empty []byte.
-func (b *Builder) Get() []byte {
+func (b *Builder) Get() ([]byte, error) {
+	var missing int = b.TotalFrags - (b.NumFrags + len(b.queue))
+
+	// Check for missing fragments
+	if missing > 0 {
+		return []byte{}, fmt.Errorf("Missing %d fragments", missing)
+	}
+
 	switch b.stream.(type) {
 	case (*bytes.Buffer):
-		return b.stream.(*bytes.Buffer).Bytes()
+		return b.stream.(*bytes.Buffer).Bytes(), nil
 	default:
-		return []byte{}
+		return []byte{}, nil
 	}
 }
 

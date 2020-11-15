@@ -154,8 +154,12 @@ func TestStreamers(t *testing.T) {
 		t.Fatalf("got: %d; want: %d", len(r.Bytes()), dataLen)
 	}
 
-	if len(b2.Get()) != dataLen {
-		t.Fatalf("got: %d; want: %d", len(b2.Get()), dataLen)
+	if data, e = b2.Get(); e != nil {
+		t.Fatalf("got: %s; want: nil", e.Error())
+	}
+
+	if len(data) != dataLen {
+		t.Fatalf("got: %d; want: %d", len(data), dataLen)
 	}
 
 	// Create Streamers and Builders
