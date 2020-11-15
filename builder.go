@@ -95,6 +95,11 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 	return nil
 }
 
+// Finished will return whether or not the builder has all fragments.
+func (b *Builder) Finished() bool {
+	return b.NumFrags == b.TotalFrags
+}
+
 // Get will return a []byte with the Builder, if the Builder was
 // created with NewByteBuilder, otherwise an empty []byte.
 func (b *Builder) Get() ([]byte, error) {
