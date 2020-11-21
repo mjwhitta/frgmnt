@@ -42,9 +42,20 @@ func NewByteBuilder(numFrags int) *Builder {
 func NewFileBuilder(path string, numFrags int) (*Builder, error) {
 	var e error
 	var f *os.File
+	var fi os.FileInfo
 
 	if f, e = os.Create(path); e != nil {
 		return nil, e
+	}
+
+	// Get file stats
+	if fi, e = f.Stat(); e != nil {
+		return nil, e
+	}
+
+	// Check if file is directory
+	if fi.IsDir() {
+		return nil, fmt.Errorf("Path %s is a directory", path)
 	}
 
 	return NewBuilder(f, numFrags), nil
