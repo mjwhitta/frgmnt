@@ -103,6 +103,13 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 		copy(b.queue[fragNum], data)
 	}
 
+	if b.Finished() {
+		switch b.stream.(type) {
+		case *os.File:
+			b.stream.(*os.File).Close()
+		}
+	}
+
 	return nil
 }
 
