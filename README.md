@@ -14,7 +14,7 @@ together again.
 Open a terminal and run the following:
 
 ```
-$ go get -u gitlab.com/mjwhitta/frgmnt
+$ go get --ldflags="-s -w" --trimpath -u gitlab.com/mjwhitta/frgmnt
 ```
 
 ## Usage
