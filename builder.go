@@ -55,7 +55,7 @@ func NewFileBuilder(path string, numFrags int) (*Builder, error) {
 
 	// Check if file is directory
 	if fi.IsDir() {
-		return nil, fmt.Errorf("path %s is a directory", path)
+		return nil, fmt.Errorf("frgmnt: path %s is a directory", path)
 	}
 
 	return NewBuilder(f, numFrags), nil
@@ -67,11 +67,16 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 
 	// Validate fragNum
 	if fragNum <= 0 {
-		return fmt.Errorf("fragment ID should be greater than 0")
+		return fmt.Errorf(
+			"frgmnt: fragment ID should be greater than 0",
+		)
 	} else if fragNum > b.TotalFrags {
-		return fmt.Errorf("fragment ID %d is out of bounds", fragNum)
+		return fmt.Errorf(
+			"frgmnt: fragment ID %d is out of bounds",
+			fragNum,
+		)
 	} else if len(data) == 0 {
-		return fmt.Errorf("fragment ID %d is empty", fragNum)
+		return fmt.Errorf("frgmnt: fragment ID %d is empty", fragNum)
 	}
 
 	if fragNum <= b.NumFrags {
@@ -125,7 +130,10 @@ func (b *Builder) Get() ([]byte, error) {
 
 	// Check for missing fragments
 	if missing > 0 {
-		return []byte{}, fmt.Errorf("missing %d fragments", missing)
+		return []byte{}, fmt.Errorf(
+			"frgmnt: missing %d fragments",
+			missing,
+		)
 	}
 
 	switch b.stream.(type) {
@@ -142,7 +150,7 @@ func (b *Builder) Hash() (string, error) {
 
 	// Check for missing fragments
 	if missing > 0 {
-		return "", fmt.Errorf("missing %d fragments", missing)
+		return "", fmt.Errorf("frgmnt: missing %d fragments", missing)
 	}
 
 	return hex.EncodeToString(b.sha.Sum([]byte{})), nil

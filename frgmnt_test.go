@@ -75,7 +75,7 @@ func testStreamer(
 		actual = e.Error()
 	}
 
-	tmp = "Missing 1 fragments"
+	tmp = "frgmnt: missing 1 fragments"
 	if actual != tmp {
 		t.Fatalf("got: %s; want: %s", actual, tmp)
 	}
@@ -171,11 +171,13 @@ func TestStreamers(t *testing.T) {
 		t.Fatalf("got: %s; want: nil", e.Error())
 	}
 
-	if b1, e = frgmnt.NewFileBuilder(f2.Name(), s.NumFrags); e != nil {
+	b1, e = frgmnt.NewFileBuilder(f2.Name(), s.NumFrags)
+	if e != nil {
 		t.Fatalf("got: %s; want: nil", e.Error())
 	}
 
-	if b2, e = frgmnt.NewFileBuilder(f3.Name(), s.NumFrags); e != nil {
+	b2, e = frgmnt.NewFileBuilder(f3.Name(), s.NumFrags)
+	if e != nil {
 		t.Fatalf("got: %s; want: nil", e.Error())
 	}
 
