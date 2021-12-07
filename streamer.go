@@ -40,7 +40,7 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 
 	// Check if file exists
 	if !pathname.DoesExist(path) {
-		return nil, fmt.Errorf("File %s does not exist", path)
+		return nil, fmt.Errorf("file %s does not exist", path)
 	}
 
 	// Open file
@@ -55,7 +55,7 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 
 	// Check if file is directory
 	if fi.IsDir() {
-		return nil, fmt.Errorf("Path %s is a directory", path)
+		return nil, fmt.Errorf("path %s is a directory", path)
 	}
 
 	return NewStreamer(f, int(fi.Size()), fragSize), nil
@@ -101,7 +101,7 @@ func (s *Streamer) Each(handler FragHandler) error {
 	if offset, e = s.stream.Seek(0, io.SeekStart); e != nil {
 		return e
 	} else if offset != 0 {
-		return fmt.Errorf("Failed to seek to beginning")
+		return fmt.Errorf("failed to seek to beginning")
 	}
 
 	// Loop thru each fragment and call handler
