@@ -111,8 +111,8 @@ func (b *Builder) Finished() bool {
 	return b.NumFrags == b.TotalFrags
 }
 
-// Get will return a []byte with the Builder, if the Builder was
-// created with NewByteBuilder, otherwise an empty []byte.
+// Get will return a []byte, if the Builder was created with
+// NewByteBuilder, otherwise an empty []byte.
 func (b *Builder) Get() ([]byte, error) {
 	var missing int = b.TotalFrags - (b.NumFrags + len(b.queue))
 
