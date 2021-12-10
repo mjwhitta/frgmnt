@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"hash"
 	"io"
 	"os"
+
+	"gitlab.com/mjwhitta/errors"
 )
 
 // Builder is a type that can rebuild a stream of fragments back into
@@ -42,22 +43,14 @@ func NewByteBuilder(numFrags int) *Builder {
 func NewFileBuilder(path string, numFrags int) (*Builder, error) {
 	var e error
 	var f *os.File
-	var fi os.FileInfo
 
+	// Attempt to initialize file
 	if f, e = os.Create(path); e != nil {
+		e = errors.Newf("failed to create file %s: %w", path, e)
 		return nil, e
 	}
 
-	// Get file stats
-	if fi, e = f.Stat(); e != nil {
-		return nil, e
-	}
-
-	// Check if file is directory
-	if fi.IsDir() {
-		return nil, fmt.Errorf("frgmnt: path %s is a directory", path)
-	}
-
+	// Return new Builder using file as io.ReadWriter
 	return NewBuilder(f, numFrags), nil
 }
 
@@ -67,16 +60,11 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 
 	// Validate fragNum
 	if fragNum <= 0 {
-		return fmt.Errorf(
-			"frgmnt: fragment ID should be greater than 0",
-		)
+		return errors.New("fragment ID should be greater than 0")
 	} else if fragNum > b.TotalFrags {
-		return fmt.Errorf(
-			"frgmnt: fragment ID %d is out of bounds",
-			fragNum,
-		)
+		return errors.Newf("fragment ID %d is out of bounds", fragNum)
 	} else if len(data) == 0 {
-		return fmt.Errorf("frgmnt: fragment ID %d is empty", fragNum)
+		return errors.Newf("fragment ID %d is empty", fragNum)
 	}
 
 	if fragNum <= b.NumFrags {
@@ -130,10 +118,7 @@ func (b *Builder) Get() ([]byte, error) {
 
 	// Check for missing fragments
 	if missing > 0 {
-		return []byte{}, fmt.Errorf(
-			"frgmnt: missing %d fragments",
-			missing,
-		)
+		return []byte{}, errors.Newf("missing %d fragments", missing)
 	}
 
 	switch b.stream.(type) {
@@ -150,7 +135,7 @@ func (b *Builder) Hash() (string, error) {
 
 	// Check for missing fragments
 	if missing > 0 {
-		return "", fmt.Errorf("frgmnt: missing %d fragments", missing)
+		return "", errors.Newf("missing %d fragments", missing)
 	}
 
 	return hex.EncodeToString(b.sha.Sum([]byte{})), nil

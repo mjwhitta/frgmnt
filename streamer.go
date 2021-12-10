@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"hash"
 	"io"
 	"os"
 
+	"gitlab.com/mjwhitta/errors"
 	"gitlab.com/mjwhitta/pathname"
 )
 
@@ -40,22 +40,24 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 
 	// Check if file exists
 	if !pathname.DoesExist(path) {
-		return nil, fmt.Errorf("frgmnt: file %s does not exist", path)
+		return nil, errors.Newf("file not found: %s", path)
 	}
 
 	// Open file
 	if f, e = os.Open(path); e != nil {
+		e = errors.Newf("failed to open %s:, %w", path, e)
 		return nil, e
 	}
 
 	// Get file stats
 	if fi, e = f.Stat(); e != nil {
+		e = errors.Newf("failed to get file info: %s:, %w", path, e)
 		return nil, e
 	}
 
 	// Check if file is directory
 	if fi.IsDir() {
-		return nil, fmt.Errorf("frgmnt: path %s is a directory", path)
+		return nil, errors.Newf("path is a directory: %s", path)
 	}
 
 	return NewStreamer(f, int(fi.Size()), fragSize), nil
@@ -99,9 +101,10 @@ func (s *Streamer) Each(handler FragHandler) error {
 
 	// Start at beginning
 	if offset, e = s.stream.Seek(0, io.SeekStart); e != nil {
+		e = errors.Newf("failed to seek to start: %w", e)
 		return e
 	} else if offset != 0 {
-		return fmt.Errorf("frgmnt: failed to seek to beginning")
+		return errors.New("failed to seek to start")
 	}
 
 	// Loop thru each fragment and call handler
@@ -109,11 +112,11 @@ func (s *Streamer) Each(handler FragHandler) error {
 		if n, e = s.stream.Read(frag[:]); (n == 0) && (e == io.EOF) {
 			return nil
 		} else if e != nil {
-			return e
+			return errors.Newf("failed to read: %w", e)
 		}
 
 		if e = handler(i, s.NumFrags, frag[:n]); e != nil {
-			return e
+			return errors.Newf("FragHandler returned error: %w", e)
 		}
 	}
 }
