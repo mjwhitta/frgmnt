@@ -105,13 +105,8 @@ func testStreamer(
 		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
 	}
 
-	// Calculate hash via Streamer
-	if actual, e = s.Hash(); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
-
-	// Compare results
-	if actual != expected {
+	// Calculate hash via Streamer and compare results
+	if actual = s.Hash(); actual != expected {
 		t.Fatalf("\ngot: %s\nwant: %s", actual, expected)
 	}
 

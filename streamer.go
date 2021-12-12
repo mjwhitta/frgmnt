@@ -122,22 +122,17 @@ func (s *Streamer) Each(handler FragHandler) error {
 }
 
 // Hash will print a SHA256 sum of all the fragments
-func (s *Streamer) Hash() (string, error) {
-	var e error
-
+func (s *Streamer) Hash() string {
 	if s.sha == nil {
 		s.sha = sha256.New()
 
-		e = s.Each(
+		s.Each(
 			func(fragNum int, numFrags int, data []byte) error {
 				s.sha.Write(data)
 				return nil
 			},
 		)
-		if e != nil {
-			return "", e
-		}
 	}
 
-	return hex.EncodeToString(s.sha.Sum([]byte{})), nil
+	return hex.EncodeToString(s.sha.Sum([]byte{}))
 }
