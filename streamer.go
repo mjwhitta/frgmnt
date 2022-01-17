@@ -37,9 +37,12 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 	var e error
 	var f *os.File
 	var fi os.FileInfo
+	var ok bool
 
 	// Check if file exists
-	if !pathname.DoesExist(path) {
+	if ok, e = pathname.DoesExist(path); e != nil {
+		return nil, errors.Newf("file not accessible: %s", path)
+	} else if !ok {
 		return nil, errors.Newf("file not found: %s", path)
 	}
 
