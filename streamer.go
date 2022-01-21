@@ -41,26 +41,26 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 
 	// Check if file exists
 	if ok, e = pathname.DoesExist(path); e != nil {
-		return nil, errors.Newf("file not accessible: %s", path)
+		return nil, errors.Newf("file %s not accessible: %w", path, e)
 	} else if !ok {
-		return nil, errors.Newf("file not found: %s", path)
+		return nil, errors.Newf("file %s not found", path)
 	}
 
 	// Open file
 	if f, e = os.Open(path); e != nil {
-		e = errors.Newf("failed to open %s:, %w", path, e)
+		e = errors.Newf("failed to open %s: %w", path, e)
 		return nil, e
 	}
 
 	// Get file stats
 	if fi, e = f.Stat(); e != nil {
-		e = errors.Newf("failed to get file info: %s:, %w", path, e)
+		e = errors.Newf("failed to get file info for %s: %w", path, e)
 		return nil, e
 	}
 
 	// Check if file is directory
 	if fi.IsDir() {
-		return nil, errors.Newf("path is a directory: %s", path)
+		return nil, errors.Newf("%s is a directory", path)
 	}
 
 	return NewStreamer(f, int(fi.Size()), fragSize), nil
