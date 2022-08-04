@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"strings"
@@ -52,14 +51,14 @@ func TestFileStreamer(t *testing.T) {
 	var err string
 
 	if runtime.GOOS != "windows" {
-		err = "frgmnt: path is a directory: /tmp"
+		err = "frgmnt: /tmp is a directory"
 		if _, e = frgmnt.NewFileStreamer("/tmp", 0); e == nil {
 			t.Fatalf("\ngot: nil\nwant: %s", err)
 		} else if e.Error() != err {
 			t.Fatalf("\ngot: %s\nwant: %s", e.Error(), err)
 		}
 
-		err = "frgmnt: file not found: /noexist"
+		err = "frgmnt: file /noexist not found"
 		if _, e = frgmnt.NewFileStreamer("/noexist", 0); e == nil {
 			t.Fatalf("\ngot: nil\nwant: %s", err)
 		} else if e.Error() != err {
@@ -173,19 +172,19 @@ func TestStreamers(t *testing.T) {
 	expected = fmt.Sprintf("%x", sha256.Sum256(data[:n]))
 
 	// Write data to tmp files
-	if f1, e = ioutil.TempFile(os.TempDir(), "frgmnt*"); e != nil {
+	if f1, e = os.CreateTemp(os.TempDir(), "frgmnt*"); e != nil {
 		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
 	}
 	defer f1.Close()
 	defer os.Remove(f1.Name())
 
-	if f2, e = ioutil.TempFile(os.TempDir(), "frgmnt*"); e != nil {
+	if f2, e = os.CreateTemp(os.TempDir(), "frgmnt*"); e != nil {
 		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
 	}
 	defer f2.Close()
 	defer os.Remove(f2.Name())
 
-	if f3, e = ioutil.TempFile(os.TempDir(), "frgmnt*"); e != nil {
+	if f3, e = os.CreateTemp(os.TempDir(), "frgmnt*"); e != nil {
 		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
 	}
 	defer f3.Close()
