@@ -8,8 +8,8 @@ import (
 	"io"
 	"os"
 
-	"gitlab.com/mjwhitta/errors"
-	"gitlab.com/mjwhitta/pathname"
+	"github.com/mjwhitta/errors"
+	"github.com/mjwhitta/pathname"
 )
 
 // FragHandler is a function pointer that will operate on each

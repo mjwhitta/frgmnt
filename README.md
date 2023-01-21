@@ -2,7 +2,7 @@
 
 <a href="https://www.buymeacoffee.com/mjwhitta">🍪 Buy me a cookie</a>
 
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/mjwhitta/frgmnt)](https://goreportcard.com/report/gitlab.com/mjwhitta/frgmnt)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mjwhitta/frgmnt)](https://goreportcard.com/report/github.com/mjwhitta/frgmnt)
 
 ## What is this?
 
@@ -14,7 +14,7 @@ together again.
 Open a terminal and run the following:
 
 ```
-$ go get --ldflags="-s -w" --trimpath -u gitlab.com/mjwhitta/frgmnt
+$ go get --ldflags="-s -w" --trimpath -u github.com/mjwhitta/frgmnt
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ import (
     "crypto/rand"
     "fmt"
 
-    "gitlab.com/mjwhitta/frgmnt"
+    "github.com/mjwhitta/frgmnt"
 )
 
 func main() {
@@ -74,4 +74,4 @@ func main() {
 
 ## Links
 
-- [Source](https://gitlab.com/mjwhitta/frgmnt)
+- [Source](https://github.com/mjwhitta/frgmnt)

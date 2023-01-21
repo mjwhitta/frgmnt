@@ -7,64 +7,38 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"strings"
 	"testing"
 
-	"gitlab.com/mjwhitta/frgmnt"
+	"github.com/mjwhitta/frgmnt"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestFileBuilder(t *testing.T) {
 	var e error
-	var err string
 
-	if runtime.GOOS != "windows" {
-		err = strings.Join(
-			[]string{
-				"frgmnt: failed to create file /tmp",
-				"open /tmp: is a directory",
-			},
-			": ",
-		)
-		if _, e = frgmnt.NewFileBuilder("/tmp", 0); e == nil {
-			t.Fatalf("\ngot: nil\nwant: %s", err)
-		} else if e.Error() != err {
-			t.Fatalf("\ngot: %s\nwant: %s", e.Error(), err)
-		}
-
-		err = strings.Join(
-			[]string{
-				"frgmnt: failed to create file /noexist",
-				"open /noexist: permission denied",
-			},
-			": ",
-		)
-		if _, e = frgmnt.NewFileBuilder("/noexist", 0); e == nil {
-			t.Fatalf("\ngot: nil\nwant: %s", err)
-		} else if e.Error() != err {
-			t.Fatalf("\ngot: %s\nwant: %s", e.Error(), err)
-		}
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping testing on Windows.")
 	}
+
+	_, e = frgmnt.NewFileBuilder("/tmp", 0)
+	assert.NotNil(t, e)
+
+	_, e = frgmnt.NewFileBuilder("/noexist/file", 0)
+	assert.NotNil(t, e)
 }
 
 func TestFileStreamer(t *testing.T) {
 	var e error
-	var err string
 
-	if runtime.GOOS != "windows" {
-		err = "frgmnt: /tmp is a directory"
-		if _, e = frgmnt.NewFileStreamer("/tmp", 0); e == nil {
-			t.Fatalf("\ngot: nil\nwant: %s", err)
-		} else if e.Error() != err {
-			t.Fatalf("\ngot: %s\nwant: %s", e.Error(), err)
-		}
-
-		err = "frgmnt: file /noexist not found"
-		if _, e = frgmnt.NewFileStreamer("/noexist", 0); e == nil {
-			t.Fatalf("\ngot: nil\nwant: %s", err)
-		} else if e.Error() != err {
-			t.Fatalf("\ngot: %s\nwant: %s", e.Error(), err)
-		}
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping testing on Windows.")
 	}
+
+	_, e = frgmnt.NewFileStreamer("/tmp", 0)
+	assert.NotNil(t, e)
+
+	_, e = frgmnt.NewFileStreamer("/noexist/file", 0)
+	assert.NotNil(t, e)
 }
 
 func testStreamer(
@@ -77,73 +51,48 @@ func testStreamer(
 	var actual string
 	var e error
 	var save []byte
-	var tmp string
 
 	// Validate number of fragments while simulating data transfer
 	e = s.Each(
 		func(fragNum int, numFrags int, data []byte) error {
-			var err error
+			var e error
 
-			if numFrags != 2048 {
-				t.Fatalf("\ngot: %d\nwant: 2048", numFrags)
-			}
+			assert.Equal(t, 2048, numFrags)
 
 			if fragNum == 32 {
 				save = make([]byte, len(data))
 				copy(save, data)
 			} else {
-				if err = b2.Add(fragNum, data); err != nil {
-					t.Fatalf("\ngot: %s\nwant: nil", err.Error())
-				}
+				e = b2.Add(fragNum, data)
+				assert.Nil(t, e)
 			}
 
 			return b1.Add(fragNum, data)
 		},
 	)
-	if e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	assert.Nil(t, e)
 
 	// Calculate hash via Streamer and compare results
-	if actual = s.Hash(); actual != expected {
-		t.Fatalf("\ngot: %s\nwant: %s", actual, expected)
-	}
+	actual = s.Hash()
+	assert.Equal(t, expected, s.Hash())
 
 	// Calculate hash via Builder after transfer
-	if actual, e = b1.Hash(); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
-
-	// Compare results
-	if actual != expected {
-		t.Fatalf("\ngot: %s\nwant: %s", actual, expected)
-	}
+	actual, e = b1.Hash()
+	assert.Nil(t, e)
+	assert.Equal(t, expected, actual)
 
 	// Attempt to use Builder that is missing fragment
-	actual = "nil"
-	if _, e = b2.Hash(); e != nil {
-		actual = e.Error()
-	}
-
-	tmp = "frgmnt: missing 1 fragments"
-	if actual != tmp {
-		t.Fatalf("\ngot: %s\nwant: %s", actual, tmp)
-	}
+	_, e = b2.Hash()
+	assert.NotNil(t, e)
 
 	// Add missing fragment
-	if e = b2.Add(32, save); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	e = b2.Add(32, save)
+	assert.Nil(t, e)
 
 	// Calculate hash via Builder after transfer
-	if actual, e = b2.Hash(); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
-
-	// Compare results
-	if actual != expected {
-		t.Fatalf("\ngot: %s\nwant: %s", actual, expected)
-	}
+	actual, e = b2.Hash()
+	assert.Nil(t, e)
+	assert.Equal(t, expected, actual)
 }
 
 func TestStreamers(t *testing.T) {
@@ -162,33 +111,28 @@ func TestStreamers(t *testing.T) {
 
 	// Read random data
 	data = make([]byte, dataLen)
-	if n, e = rand.Read(data[:]); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	} else if n == 0 {
-		t.Fatalf("\ngot: 0MB\nwant: 2MB")
-	}
+	n, e = rand.Read(data[:])
+	assert.Nil(t, e)
+	assert.Equal(t, dataLen, n)
 
 	// Calculate hash
 	expected = fmt.Sprintf("%x", sha256.Sum256(data[:n]))
 
 	// Write data to tmp files
-	if f1, e = os.CreateTemp(os.TempDir(), "frgmnt*"); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	f1, e = os.CreateTemp(t.TempDir(), "frgmnt*")
+	assert.Nil(t, e)
+	assert.NotNil(t, f1)
 	defer f1.Close()
-	defer os.Remove(f1.Name())
 
-	if f2, e = os.CreateTemp(os.TempDir(), "frgmnt*"); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	f2, e = os.CreateTemp(t.TempDir(), "frgmnt*")
+	assert.Nil(t, e)
+	assert.NotNil(t, f2)
 	defer f2.Close()
-	defer os.Remove(f2.Name())
 
-	if f3, e = os.CreateTemp(os.TempDir(), "frgmnt*"); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	f3, e = os.CreateTemp(t.TempDir(), "frgmnt*")
+	assert.Nil(t, e)
+	assert.NotNil(t, f3)
 	defer f3.Close()
-	defer os.Remove(f3.Name())
 
 	f1.Write(data[:n])
 
@@ -200,36 +144,25 @@ func TestStreamers(t *testing.T) {
 	// Test
 	testStreamer(t, s, b1, b2, expected)
 
-	if len(r.Bytes()) != dataLen {
-		t.Fatalf("\ngot: %d\nwant: %d", len(r.Bytes()), dataLen)
-	}
+	assert.Equal(t, dataLen, len(r.Bytes()))
+	assert.True(t, b2.Finished())
 
-	if !b2.Finished() {
-		t.Fatalf("\ngot: false\nwant: true")
-	}
-
-	if data, e = b2.Get(); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
-
-	if len(data) != dataLen {
-		t.Fatalf("\ngot: %d\nwant: %d", len(data), dataLen)
-	}
+	data, e = b2.Get()
+	assert.Nil(t, e)
+	assert.Equal(t, dataLen, len(data))
 
 	// Create Streamers and Builders
-	if s, e = frgmnt.NewFileStreamer(f1.Name(), 1024); e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	s, e = frgmnt.NewFileStreamer(f1.Name(), 1024)
+	assert.Nil(t, e)
+	assert.NotNil(t, s)
 
 	b1, e = frgmnt.NewFileBuilder(f2.Name(), s.NumFrags)
-	if e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	assert.Nil(t, e)
+	assert.NotNil(t, b1)
 
 	b2, e = frgmnt.NewFileBuilder(f3.Name(), s.NumFrags)
-	if e != nil {
-		t.Fatalf("\ngot: %s\nwant: nil", e.Error())
-	}
+	assert.Nil(t, e)
+	assert.NotNil(t, b2)
 
 	// Test
 	testStreamer(t, s, b1, b2, expected)

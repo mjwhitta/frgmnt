@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 
-	"gitlab.com/mjwhitta/errors"
+	"github.com/mjwhitta/errors"
 )
 
 // Builder is a type that can rebuild a stream of fragments back into
