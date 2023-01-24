@@ -73,7 +73,6 @@ func testStreamer(
 	assert.Nil(t, e)
 
 	// Calculate hash via Streamer and compare results
-	actual = s.Hash()
 	assert.Equal(t, expected, s.Hash())
 
 	// Calculate hash via Builder after transfer
