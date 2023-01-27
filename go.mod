@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/mjwhitta/errors v1.0.1
-	github.com/mjwhitta/pathname v1.2.3
+	github.com/mjwhitta/pathname v1.2.4
 	github.com/stretchr/testify v1.8.1
 )
 
