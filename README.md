@@ -1,9 +1,11 @@
 # Frgmnt
 
-[![Yum](https://img.shields.io/badge/-Buy%20me%20a%20cookie-blue?style=for-the-badge&logo=cookiecutter)](https://www.buymeacoffee.com/mjwhitta)
+[![Yum](https://img.shields.io/badge/-Buy%20me%20a%20cookie-blue?labelColor=grey&logo=cookiecutter&style=for-the-badge)](https://www.buymeacoffee.com/mjwhitta)
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/mjwhitta/frgmnt)](https://goreportcard.com/report/github.com/mjwhitta/frgmnt)
-![Workflow](https://github.com/mjwhitta/frgmnt/actions/workflows/ci.yaml/badge.svg?event=push)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mjwhitta/frgmnt?style=for-the-badge)](https://goreportcard.com/report/github.com/mjwhitta/frgmnt)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mjwhitta/frgmnt/ci.yaml?style=for-the-badge)
+![Lines of code](https://img.shields.io/tokei/lines/github/mjwhitta/frgmnt?style=for-the-badge)
+![License](https://img.shields.io/github/license/mjwhitta/frgmnt?style=for-the-badge)
 
 ## What is this?
 
@@ -15,7 +17,7 @@ together again.
 Open a terminal and run the following:
 
 ```
-$ go get --ldflags="-s -w" --trimpath -u github.com/mjwhitta/frgmnt
+$ go get --ldflags "-s -w" --trimpath -u github.com/mjwhitta/frgmnt
 ```
 
 ## Usage
