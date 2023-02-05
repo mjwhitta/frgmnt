@@ -4,7 +4,6 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mjwhitta/frgmnt?style=for-the-badge)](https://goreportcard.com/report/github.com/mjwhitta/frgmnt)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mjwhitta/frgmnt/ci.yaml?style=for-the-badge)](https://github.com/mjwhitta/frgmnt/actions)
-![Lines of code](https://img.shields.io/tokei/lines/github/mjwhitta/frgmnt?style=for-the-badge)
 ![License](https://img.shields.io/github/license/mjwhitta/frgmnt?style=for-the-badge)
 
 ## What is this?
