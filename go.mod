@@ -3,9 +3,9 @@ module github.com/mjwhitta/frgmnt
 go 1.19
 
 require (
-	github.com/mjwhitta/errors v1.0.1
-	github.com/mjwhitta/pathname v1.2.4
-	github.com/stretchr/testify v1.8.1
+	github.com/mjwhitta/errors v1.0.2
+	github.com/mjwhitta/pathname v1.2.5
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
