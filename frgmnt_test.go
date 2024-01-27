@@ -98,7 +98,7 @@ func TestStreamers(t *testing.T) {
 	var b1 *frgmnt.Builder
 	var b2 *frgmnt.Builder
 	var data []byte
-	var dataLen = 2 * 1024 * 1024 // 2MB
+	var dataLen int = 2 * 1024 * 1024 // 2MB
 	var e error
 	var expected string
 	var f1 *os.File
