@@ -4,4 +4,4 @@ package frgmnt
 var FragmentSize int = 1 * 1024 * 1024
 
 // Version is the package version.
-const Version = "1.4.8"
+const Version string = "1.4.9"
