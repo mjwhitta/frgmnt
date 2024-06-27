@@ -16,7 +16,7 @@ together again.
 Open a terminal and run the following:
 
 ```
-$ go get --ldflags "-s -w" --trimpath -u github.com/mjwhitta/frgmnt
+$ go get -u github.com/mjwhitta/frgmnt
 ```
 
 ## Usage
