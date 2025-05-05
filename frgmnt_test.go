@@ -133,7 +133,7 @@ func TestStreamers(t *testing.T) {
 	assert.NotNil(t, f3)
 	defer f3.Close()
 
-	f1.Write(data[:n])
+	_, _ = f1.Write(data[:n])
 
 	// Create Streamers and Builders
 	s = frgmnt.NewByteStreamer(data[:n], 1024) // 1KB

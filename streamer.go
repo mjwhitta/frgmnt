@@ -129,7 +129,7 @@ func (s *Streamer) Hash() string {
 	if s.sha == nil {
 		s.sha = sha256.New()
 
-		s.Each(
+		_ = s.Each(
 			func(fragNum int, numFrags int, data []byte) error {
 				s.sha.Write(data)
 				return nil

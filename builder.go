@@ -73,7 +73,7 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 	} else if fragNum == (b.NumFrags + 1) {
 		// Add fragment
 		b.sha.Write(data)
-		b.stream.Write(data)
+		_, _ = b.stream.Write(data)
 		b.NumFrags++
 
 		for {
@@ -84,7 +84,7 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 
 			// Add fragment
 			b.sha.Write(data)
-			b.stream.Write(data)
+			_, _ = b.stream.Write(data)
 			b.NumFrags++
 
 			// Delete queued fragment
