@@ -1,3 +1,4 @@
+//nolint:godoclint // These are tests
 package frgmnt_test
 
 import (
@@ -21,10 +22,10 @@ func TestFileBuilder(t *testing.T) {
 	}
 
 	_, e = frgmnt.NewFileBuilder("/tmp", 0)
-	assert.NotNil(t, e)
+	assert.Error(t, e)
 
 	_, e = frgmnt.NewFileBuilder("/noexist/file", 0)
-	assert.NotNil(t, e)
+	assert.Error(t, e)
 }
 
 func TestFileStreamer(t *testing.T) {
@@ -35,10 +36,10 @@ func TestFileStreamer(t *testing.T) {
 	}
 
 	_, e = frgmnt.NewFileStreamer("/tmp", 0)
-	assert.NotNil(t, e)
+	assert.Error(t, e)
 
 	_, e = frgmnt.NewFileStreamer("/noexist/file", 0)
-	assert.NotNil(t, e)
+	assert.Error(t, e)
 }
 
 func testStreamer(
@@ -48,6 +49,8 @@ func testStreamer(
 	b2 *frgmnt.Builder,
 	expected string,
 ) {
+	t.Helper()
+
 	var actual string
 	var e error
 	var save []byte
@@ -64,33 +67,33 @@ func testStreamer(
 				copy(save, data)
 			} else {
 				e = b2.Add(fragNum, data)
-				assert.Nil(t, e)
+				assert.NoError(t, e)
 			}
 
 			return b1.Add(fragNum, data)
 		},
 	)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 
 	// Calculate hash via Streamer and compare results
 	assert.Equal(t, expected, s.Hash())
 
 	// Calculate hash via Builder after transfer
 	actual, e = b1.Hash()
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.Equal(t, expected, actual)
 
 	// Attempt to use Builder that is missing fragment
 	_, e = b2.Hash()
-	assert.NotNil(t, e)
+	assert.Error(t, e)
 
 	// Add missing fragment
 	e = b2.Add(32, save)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 
 	// Calculate hash via Builder after transfer
 	actual, e = b2.Hash()
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.Equal(t, expected, actual)
 }
 
@@ -110,8 +113,8 @@ func TestStreamers(t *testing.T) {
 
 	// Read random data
 	data = make([]byte, dataLen)
-	n, e = rand.Read(data[:])
-	assert.Nil(t, e)
+	n, e = rand.Read(data)
+	assert.NoError(t, e)
 	assert.Equal(t, dataLen, n)
 
 	// Calculate hash
@@ -119,19 +122,19 @@ func TestStreamers(t *testing.T) {
 
 	// Write data to tmp files
 	f1, e = os.CreateTemp(t.TempDir(), "frgmnt*")
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, f1)
-	defer f1.Close()
+	defer f1.Close() //nolint:errcheck // just a test, don't care
 
 	f2, e = os.CreateTemp(t.TempDir(), "frgmnt*")
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, f2)
-	defer f2.Close()
+	defer f2.Close() //nolint:errcheck // just a test, don't care
 
 	f3, e = os.CreateTemp(t.TempDir(), "frgmnt*")
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, f3)
-	defer f3.Close()
+	defer f3.Close() //nolint:errcheck // just a test, don't care
 
 	_, _ = f1.Write(data[:n])
 
@@ -143,24 +146,24 @@ func TestStreamers(t *testing.T) {
 	// Test
 	testStreamer(t, s, b1, b2, expected)
 
-	assert.Equal(t, dataLen, len(r.Bytes()))
+	assert.Len(t, r.Bytes(), dataLen)
 	assert.True(t, b2.Finished())
 
 	data, e = b2.Get()
-	assert.Nil(t, e)
-	assert.Equal(t, dataLen, len(data))
+	assert.NoError(t, e)
+	assert.Len(t, data, dataLen)
 
 	// Create Streamers and Builders
 	s, e = frgmnt.NewFileStreamer(f1.Name(), 1024)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, s)
 
 	b1, e = frgmnt.NewFileBuilder(f2.Name(), s.NumFrags)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, b1)
 
 	b2, e = frgmnt.NewFileBuilder(f3.Name(), s.NumFrags)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, b2)
 
 	// Test

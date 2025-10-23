@@ -7,6 +7,7 @@ import (
 	"hash"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/mjwhitta/errors"
 	"github.com/mjwhitta/pathname"
@@ -47,7 +48,7 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 	}
 
 	// Open file
-	if f, e = os.Open(path); e != nil {
+	if f, e = os.Open(filepath.Clean(path)); e != nil {
 		e = errors.Newf("failed to open %s: %w", path, e)
 		return nil, e
 	}
@@ -112,7 +113,7 @@ func (s *Streamer) Each(handler FragHandler) error {
 
 	// Loop thru each fragment and call handler
 	for i := 1; ; i++ {
-		if n, e = s.stream.Read(frag[:]); (n == 0) && (e == io.EOF) {
+		if n, e = s.stream.Read(frag); (n == 0) && (e == io.EOF) {
 			return nil
 		} else if e != nil {
 			return errors.Newf("failed to read: %w", e)

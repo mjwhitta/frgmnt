@@ -7,6 +7,7 @@ import (
 	"hash"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/mjwhitta/errors"
 )
@@ -45,7 +46,7 @@ func NewFileBuilder(path string, numFrags int) (*Builder, error) {
 	var f *os.File
 
 	// Attempt to initialize file
-	if f, e = os.Create(path); e != nil {
+	if f, e = os.Create(filepath.Clean(path)); e != nil {
 		e = errors.Newf("failed to create file %s: %w", path, e)
 		return nil, e
 	}
@@ -59,18 +60,20 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 	var ok bool
 
 	// Validate fragNum
-	if fragNum <= 0 {
+	switch {
+	case fragNum <= 0:
 		return errors.New("fragment ID should be greater than 0")
-	} else if fragNum > b.TotalFrags {
+	case fragNum > b.TotalFrags:
 		return errors.Newf("fragment ID %d is out of bounds", fragNum)
-	} else if len(data) == 0 {
+	case len(data) == 0:
 		return errors.Newf("fragment ID %d is empty", fragNum)
 	}
 
-	if fragNum <= b.NumFrags {
+	switch {
+	case fragNum <= b.NumFrags:
 		// Throw away repeat fragments
 		return nil
-	} else if fragNum == (b.NumFrags + 1) {
+	case fragNum == (b.NumFrags + 1):
 		// Add fragment
 		b.sha.Write(data)
 		_, _ = b.stream.Write(data)
@@ -90,16 +93,17 @@ func (b *Builder) Add(fragNum int, data []byte) error {
 			// Delete queued fragment
 			delete(b.queue, b.NumFrags)
 		}
-	} else {
+	default:
 		// Queue fragment for later
 		b.queue[fragNum] = make([]byte, len(data))
 		copy(b.queue[fragNum], data)
 	}
 
 	if b.Finished() {
-		switch b.stream.(type) {
-		case *os.File:
-			b.stream.(*os.File).Close()
+		if f, ok := b.stream.(*os.File); ok {
+			if e := f.Close(); e != nil {
+				return errors.Newf("failed to close stream: %w", e)
+			}
 		}
 	}
 
@@ -121,12 +125,11 @@ func (b *Builder) Get() ([]byte, error) {
 		return []byte{}, errors.Newf("missing %d fragments", missing)
 	}
 
-	switch b.stream.(type) {
-	case (*bytes.Buffer):
-		return b.stream.(*bytes.Buffer).Bytes(), nil
-	default:
-		return []byte{}, nil
+	if buf, ok := b.stream.(*bytes.Buffer); ok {
+		return buf.Bytes(), nil
 	}
+
+	return []byte{}, nil
 }
 
 // Hash will print a SHA256 sum of all the fragments
