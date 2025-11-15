@@ -57,10 +57,10 @@ func testStreamer(
 
 	// Validate number of fragments while simulating data transfer
 	e = s.Each(
-		func(fragNum int, numFrags int, data []byte) error {
+		func(fragNum uint64, numFrags uint64, data []byte) error {
 			var e error
 
-			assert.Equal(t, 2048, numFrags)
+			assert.Equal(t, uint64(2048), numFrags)
 
 			if fragNum == 32 {
 				save = make([]byte, len(data))

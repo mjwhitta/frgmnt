@@ -15,26 +15,37 @@ import (
 
 // FragHandler is a function pointer that will operate on each
 // fragment when Each() is called.
-type FragHandler func(fragNum int, numFrags int, data []byte) error
+type FragHandler func(
+	fragNum uint64,
+	numFrags uint64,
+	data []byte,
+) error
 
 // Streamer is a type that can convert a blob of data into a stream of
 // fragments.
 type Streamer struct {
-	FragmentSize int
-	NumFrags     int
+	FragmentSize uint64
+	NumFrags     uint64
 	sha          hash.Hash
 	stream       io.ReadSeeker
 }
 
 // NewByteStreamer will return a pointer to a new Streamer instance
 // from a []byte.
-func NewByteStreamer(data []byte, fragSize int) *Streamer {
-	return NewStreamer(bytes.NewReader(data), len(data), fragSize)
+func NewByteStreamer(data []byte, fragSize uint64) *Streamer {
+	return NewStreamer(
+		bytes.NewReader(data),
+		uint64(len(data)),
+		fragSize,
+	)
 }
 
 // NewFileStreamer will return a pointer to a new Streamer instance
 // from a file path.
-func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
+func NewFileStreamer(
+	path string,
+	fragSize uint64,
+) (*Streamer, error) {
 	var e error
 	var f *os.File
 	var fi os.FileInfo
@@ -64,17 +75,18 @@ func NewFileStreamer(path string, fragSize int) (*Streamer, error) {
 		return nil, errors.Newf("%s is a directory", path)
 	}
 
-	return NewStreamer(f, int(fi.Size()), fragSize), nil
+	//nolint:gosec // G115 - file can't have negative size
+	return NewStreamer(f, uint64(fi.Size()), fragSize), nil
 }
 
 // NewStreamer will return a pointer to a new Streamer instance from a
 // ReadSeeker.
 func NewStreamer(
 	r io.ReadSeeker,
-	streamSize int,
-	fragSize int,
+	streamSize uint64,
+	fragSize uint64,
 ) *Streamer {
-	var frags int
+	var frags uint64
 
 	// Use default
 	if fragSize == 0 {
@@ -119,7 +131,8 @@ func (s *Streamer) Each(handler FragHandler) error {
 			return errors.Newf("failed to read: %w", e)
 		}
 
-		if e = handler(i, s.NumFrags, frag[:n]); e != nil {
+		//nolint:gosec // G115 - i can only be > 0
+		if e = handler(uint64(i), s.NumFrags, frag[:n]); e != nil {
 			return errors.Newf("FragHandler returned error: %w", e)
 		}
 	}
@@ -131,7 +144,7 @@ func (s *Streamer) Hash() string {
 		s.sha = sha256.New()
 
 		_ = s.Each(
-			func(fragNum int, numFrags int, data []byte) error {
+			func(fragNum uint64, numFrags uint64, data []byte) error {
 				s.sha.Write(data)
 				return nil
 			},
