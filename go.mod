@@ -1,10 +1,10 @@
 module github.com/mjwhitta/frgmnt
 
-go 1.23.0
+go 1.24.0
 
 require (
-	github.com/mjwhitta/errors v1.0.6
-	github.com/mjwhitta/pathname v1.3.0
+	github.com/mjwhitta/errors v1.0.7
+	github.com/mjwhitta/pathname v1.3.1
 	github.com/stretchr/testify v1.11.1
 )
 
