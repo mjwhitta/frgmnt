@@ -7,7 +7,6 @@ import (
 	"hash"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/mjwhitta/errors"
 	"github.com/mjwhitta/pathname"
@@ -59,7 +58,7 @@ func NewFileStreamer(
 	}
 
 	// Open file
-	if f, e = os.Open(filepath.Clean(path)); e != nil {
+	if f, e = os.Open(pathname.ExpandPath(path)); e != nil {
 		e = errors.Newf("failed to open %s: %w", path, e)
 		return nil, e
 	}

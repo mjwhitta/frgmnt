@@ -7,9 +7,9 @@ import (
 	"hash"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/mjwhitta/errors"
+	"github.com/mjwhitta/pathname"
 )
 
 // Builder is a type that can rebuild a stream of fragments back into
@@ -46,7 +46,7 @@ func NewFileBuilder(path string, numFrags uint64) (*Builder, error) {
 	var f *os.File
 
 	// Attempt to initialize file
-	if f, e = os.Create(filepath.Clean(path)); e != nil {
+	if f, e = os.Create(pathname.ExpandPath(path)); e != nil {
 		e = errors.Newf("failed to create file %s: %w", path, e)
 		return nil, e
 	}
