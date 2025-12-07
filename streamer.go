@@ -74,7 +74,6 @@ func NewFileStreamer(
 		return nil, errors.Newf("%s is a directory", path)
 	}
 
-	//nolint:gosec // G115 - file can't have negative size
 	return NewStreamer(f, uint64(fi.Size()), fragSize), nil
 }
 
@@ -130,7 +129,6 @@ func (s *Streamer) Each(handler FragHandler) error {
 			return errors.Newf("failed to read: %w", e)
 		}
 
-		//nolint:gosec // G115 - i can only be > 0
 		if e = handler(uint64(i), s.NumFrags, frag[:n]); e != nil {
 			return errors.Newf("FragHandler returned error: %w", e)
 		}
