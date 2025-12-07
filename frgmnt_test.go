@@ -124,17 +124,17 @@ func TestStreamers(t *testing.T) {
 	f1, e = os.CreateTemp(t.TempDir(), "frgmnt*")
 	assert.NoError(t, e)
 	assert.NotNil(t, f1)
-	defer f1.Close() //nolint:errcheck // just a test, don't care
+	defer f1.Close() //nolint:errcheck // Just a test, don't care
 
 	f2, e = os.CreateTemp(t.TempDir(), "frgmnt*")
 	assert.NoError(t, e)
 	assert.NotNil(t, f2)
-	defer f2.Close() //nolint:errcheck // just a test, don't care
+	defer f2.Close() //nolint:errcheck // Just a test, don't care
 
 	f3, e = os.CreateTemp(t.TempDir(), "frgmnt*")
 	assert.NoError(t, e)
 	assert.NotNil(t, f3)
-	defer f3.Close() //nolint:errcheck // just a test, don't care
+	defer f3.Close() //nolint:errcheck // Just a test, don't care
 
 	_, _ = f1.Write(data[:n])
 
