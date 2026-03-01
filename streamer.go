@@ -74,6 +74,7 @@ func NewFileStreamer(
 		return nil, errors.Newf("%s is a directory", path)
 	}
 
+	//nolint:gosec // G115 - file size can't be negative
 	return NewStreamer(f, uint64(fi.Size()), fragSize), nil
 }
 
